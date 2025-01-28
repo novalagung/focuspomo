@@ -25,6 +25,7 @@ const RootStack = createBottomTabNavigator({
         Settings: SettingsScreen,
     },
     screenOptions:  ({ route }) => ({
+        headerShown: false,
         tabBarIcon: ({}) => {
             switch (route.name) {
                 case 'Statistic': return (<Icon name="chart-simple" size={20} iconStyle="solid" />)

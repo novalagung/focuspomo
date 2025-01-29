@@ -10,13 +10,13 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import {createNativeStackNavigator} from "@react-navigation/native-stack";
 import StatisticScreen from './src/screen/StatisticScreen';
 import SessionScreen from "./src/screen/SessionScreen";
-import ScheduleScreen from "./src/screen/ScheduleScreen";
-import SettingsScreen from "./src/screen/SettingsScreen";
+import ScheduleScreenWIP from "./src/screen/ScheduleScreenWIP";
+import SettingsScreenWIP from "./src/screen/SettingsScreenWIP";
 import Icon from '@react-native-vector-icons/fontawesome6';
 import TagScreen from "./src/screen/TagScreen";
 import LandingScreen from "./src/screen/LandingScreen";
 import SignUpScreen from "./src/screen/SignUpScreen";
-import OTPScreen from "./src/screen/OTPScreen";
+import OTPScreenWIP from "./src/screen/OTPScreenWIP";
 import SignInScreen from "./src/screen/SignInScreen";
 import ForgotPasswordScreen from "./src/screen/ForgotPasswordScreen";
 
@@ -25,8 +25,8 @@ const BottomStack = createBottomTabNavigator({
     screens: {
         Statistic: StatisticScreen,
         Session: SessionScreen,
-        Schedule: ScheduleScreen,
-        Settings: SettingsScreen,
+        Schedule: ScheduleScreenWIP,
+        Settings: SettingsScreenWIP,
     },
     screenOptions:  ({ route }) => ({
         headerShown: false,
@@ -47,7 +47,7 @@ const RootStack = createNativeStackNavigator({
         BottomStack: BottomStack,
         Landing: LandingScreen,
         SignUp: SignUpScreen,
-        OTP: OTPScreen,
+        OTP: OTPScreenWIP,
         SignIn: SignInScreen,
         ForgotPassword: ForgotPasswordScreen,
         Tag: TagScreen,

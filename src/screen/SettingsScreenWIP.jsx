@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { View, Text } from 'react-native';
 
-function SettingsScreen() {
+function SettingsScreenWIP() {
     return (
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
             <Text>settings</Text>
@@ -10,4 +10,4 @@ function SettingsScreen() {
     );
 }
 
-export default SettingsScreen;
+export default SettingsScreenWIP;

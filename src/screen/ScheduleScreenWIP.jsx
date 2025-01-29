@@ -2,12 +2,12 @@
 import * as React from 'react';
 import { View, Text } from 'react-native';
 
-function OTPScreen() {
+function ScheduleScreenWIP() {
     return (
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-            <Text>OTPScreen</Text>
+            <Text>Schedule</Text>
         </View>
     );
 }
 
-export default OTPScreen;
+export default ScheduleScreenWIP;

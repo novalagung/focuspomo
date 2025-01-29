@@ -1,11 +1,13 @@
 
 import * as React from 'react';
-import {View, Text, TextInput, Button, Alert, TouchableOpacity, Modal, Pressable, StyleSheet } from 'react-native';
+import {View, Text, TextInput, Alert, TouchableOpacity, Modal, StyleSheet } from 'react-native';
 import {SafeAreaView, SafeAreaProvider} from 'react-native-safe-area-context';
-import {create} from 'zustand'
-import BackgroundTimer from '@boterop/react-native-background-timer';
 import {useEffect, useRef} from "react";
 import Icon from "@react-native-vector-icons/fontawesome6";
+import {useNavigation} from '@react-navigation/native';
+import useSessionStore from "../store/session-store";
+import useTagStore from "../store/tag-store";
+import useUserStore from "../store/user-store";
 
 const convertDurationHmToSeconds = (text) => {
     let duration = 0
@@ -31,25 +33,13 @@ const convertDurationSecondsToHm = (duration) => {
     }
 }
 
-const useSessionStore = create((set) => ({
-    tag: 'Study',
-    focusDurationLabel: '00:15', // '25:00',
-    focusDuration: 15, // 25 * 60,
-    shortBreakDurationLabel: '00:10', // '05:00',
-    shortBreakDuration: 10, // 3 * 60,
-    longBreakDurationLabel: '00:07', // '25:00',
-    longBreakDuration: 7, // 25 * 60,
-
-    activeSessionActivity: 'inactive', // focus / short break / long break
-    activeStopwatch: 0,
-    focusRepeatCount: 3,
-    focusCompleted: 0,
-
-    showModal: ''
-}))
-
 function SessionScreen() {
-    const tag = useSessionStore((state) => state.tag)
+    const navigation = useNavigation();
+
+    const session = useUserStore((state) => state.session);
+
+    const activeTag = useTagStore((state) => state.activeTag)
+
     const focusDurationLabel = useSessionStore((state) => state.focusDurationLabel)
     const focusDuration = useSessionStore((state) => state.focusDuration)
     const shortBreakDurationLabel = useSessionStore((state) => state.shortBreakDurationLabel)
@@ -86,6 +76,7 @@ function SessionScreen() {
     }
 
     const startShortBreak = () => {
+        console.log('start short break')
         useSessionStore.setState({
             activeSessionActivity: 'short break',
             activeStopwatch: shortBreakDuration,
@@ -101,6 +92,7 @@ function SessionScreen() {
     }
 
     const startLongBreak = () => {
+        console.log('start long break')
         useSessionStore.setState({
             activeSessionActivity: 'long break',
             activeStopwatch: longBreakDuration,
@@ -109,16 +101,16 @@ function SessionScreen() {
         })
     }
 
-    const resumeFocus = (activityName) => {
-        console.log('resume activity', activityName)
+    const resumeFocus = () => {
+        console.log('resume focus')
         useSessionStore.setState({
-            activeSessionActivity: activityName,
+            activeSessionActivity: 'focus',
         })
         setTimeout(startTimer, 100)
     }
 
-    const stopActivity = () => {
-        console.log('stop activity')
+    const stopSession = () => {
+        console.log('stop session')
         useSessionStore.setState({
             activeSessionActivity: 'inactive',
         })
@@ -153,7 +145,7 @@ function SessionScreen() {
                 startFocus()
             } else if (activeSessionActivityRef.current === 'long break') {
                 console.log('===> stop everything', nextTime, activeSessionActivityRef.current, focusCompleted)
-                stopActivity()
+                stopSession()
             }
         }
     }
@@ -166,32 +158,40 @@ function SessionScreen() {
         setTimeout(startTimer,  1000);
     }, [activeStopwatch])
 
-    if (showModal === 'after focus') {
-        return (
-            <SafeAreaProvider>
-                <SafeAreaView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                    <Modal
-                        animationType="slide"
-                        visible={true}
-                        onRequestClose={() => { useSessionStore.setState({showModal: ''}) }}>
-                        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'red' }}>
-                            <TouchableOpacity onPress={() => { useSessionStore.setState({showModal: ''}) }}>
-                                <View style={{ margin: 20, backgroundColor: 'white', borderRadius: 20, padding: 35, alignItems: 'center', shadowColor: '#000' }}>
-                                    <Text>Hello World!</Text>
-                                    <Text>Tap to dismiss</Text>
-                                </View>
-                            </TouchableOpacity>
-                        </View>
-                    </Modal>
-                </SafeAreaView>
-            </SafeAreaProvider>
-        )
-    } else if (activeSessionActivity === 'inactive') {
+    if (!session) {
+        navigation.navigate('Landing')
+        return
+    }
+
+    // if (showModal === 'after focus') {
+    //     return (
+    //         <SafeAreaProvider>
+    //             <SafeAreaView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+    //                 <Modal
+    //                     animationType="slide"
+    //                     visible={true}
+    //                     onRequestClose={() => { useSessionStore.setState({showModal: ''}) }}>
+    //                     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'red' }}>
+    //                         <TouchableOpacity onPress={() => { useSessionStore.setState({showModal: ''}) }}>
+    //                             <View style={{ margin: 20, backgroundColor: 'white', borderRadius: 20, padding: 35, alignItems: 'center', shadowColor: '#000' }}>
+    //                                 <Text>Hello World!</Text>
+    //                                 <Text>Tap to dismiss</Text>
+    //                             </View>
+    //                         </TouchableOpacity>
+    //                     </View>
+    //                 </Modal>
+    //             </SafeAreaView>
+    //         </SafeAreaProvider>
+    //     )
+    // }
+
+    if (activeSessionActivity === 'inactive') {
+        const tag = useTagStore.getState().tags.find((e) => e.id === activeTag)
         return (
             <SafeAreaProvider>
                 <SafeAreaView style={[stylesBase.container, stylesInactive.container]}>
-                    <Text style={stylesInactive.tag} fontSize={"16"} onPress={() => { Alert.alert("CHAGNE TAG") }}>
-                        {tag} <Icon name="tag" size={16} iconStyle="solid" />
+                    <Text style={stylesInactive.tag} fontSize={"16"} onPress={() => navigation.navigate('Tag')}>
+                        {tag.name} <Icon name="tag" size={16} iconStyle="solid" />
                     </Text>
                     <TextInput style={[stylesBase.timer, stylesInactive.timer]} value={focusDurationLabel} onChangeText={setFocusDurationLabel}></TextInput>
                     <TouchableOpacity style={stylesBase.buttonContainer} onPress={startFocus}>
@@ -209,7 +209,7 @@ function SessionScreen() {
                         animationType={"none"}
                         visible={true}>
                         <View style={[stylesBase.container, stylesFocus.container]}>
-                            <TouchableOpacity onLongPress={stopActivity} delayLongPress={1000} style={stylesBase.container}>
+                            <TouchableOpacity onLongPress={stopSession} delayLongPress={1000} style={stylesBase.container}>
                                 <Text style={stylesFocus.activityName}>{`Focus #${focusCompleted + 1}`}</Text>
                                 <Text style={[stylesBase.timer, stylesFocus.timer]}>{convertDurationSecondsToHm(activeStopwatch)}</Text>
                                 <TouchableOpacity style={stylesBase.buttonContainer} onPress={pauseFocus}>
@@ -230,12 +230,12 @@ function SessionScreen() {
                         animationType={"none"}
                         visible={true}>
                         <View style={[stylesBase.container, stylesFocus.container]}>
-                            <TouchableOpacity onLongPress={stopActivity} delayLongPress={1000} style={stylesBase.container}>
+                            <TouchableOpacity onLongPress={stopSession} delayLongPress={1000} style={stylesBase.container}>
                                 <Text style={stylesFocus.activityName}>
                                     {`Focus is paused`}  <Icon name="hourglass" size={16} iconStyle="regular" color={"white"} />
                                 </Text>
                                 <Text style={[stylesBase.timer, stylesFocus.timer]}>{convertDurationSecondsToHm(activeStopwatch)}</Text>
-                                <TouchableOpacity style={stylesBase.buttonContainer} onPress={() => resumeFocus('focus')}>
+                                <TouchableOpacity style={stylesBase.buttonContainer} onPress={resumeFocus}>
                                     <Text style={stylesBase.buttonText}>Resume</Text>
                                 </TouchableOpacity>
                                 <Text style={stylesFocus.holdInfo}>Hold to stop the session</Text>
@@ -253,10 +253,10 @@ function SessionScreen() {
                     <Modal
                         animationType={"none"}
                         visible={true}>
-                        <View style={[stylesBase.container, stylesShortBreak.container]}>
-                            <TouchableOpacity onLongPress={stopActivity} delayLongPress={1000} style={stylesBase.container}>
-                                <Text style={stylesShortBreak.activityName}>{`Short break #${focusCompleted}`}</Text>
-                                <Text style={[stylesBase.timer, stylesShortBreak.timer]}>{convertDurationSecondsToHm(activeStopwatch)}</Text>
+                        <View style={[stylesBase.container, stylesBreak.container]}>
+                            <TouchableOpacity onLongPress={stopSession} delayLongPress={1000} style={stylesBase.container}>
+                                <Text style={stylesBreak.activityName}>{`Short break #${focusCompleted}`}</Text>
+                                <Text style={[stylesBase.timer, stylesBreak.timer]}>{convertDurationSecondsToHm(activeStopwatch)}</Text>
                                 <TouchableOpacity style={stylesBase.buttonContainer} onPress={startFocus}>
                                     <Text style={stylesBase.buttonText}>Stop break</Text>
                                 </TouchableOpacity>
@@ -267,26 +267,25 @@ function SessionScreen() {
             </SafeAreaProvider>
         )
     } else if (activeSessionActivity === 'long break') {
-        const focusCompleted = useSessionStore.getState().focusCompleted
         return (
-            <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-                <Text>{`Long break`}</Text>
-                <Text>{convertDurationSecondsToHm(activeStopwatch)}</Text>
-                { (activeSessionActivity === 'long break') ? (
-                    <View>
-                        <Button title='Pause' onPress={() => pauseActivity()} />
-                    </View>
-                ) : (
-                    <View>
-                        <Button title='Resume' onPress={() => resumeFocus(activeSessionActivity)} />
-                        <Button title='Stop' onPress={() => tryToStopActivity()} />
-                    </View>
-                )}
-            </View>
+            <SafeAreaProvider>
+                <SafeAreaView style={stylesBase.container}>
+                    <Modal
+                        animationType={"none"}
+                        visible={true}>
+                        <View style={[stylesBase.container, stylesBreak.container]}>
+                            <TouchableOpacity onLongPress={stopSession} delayLongPress={1000} style={stylesBase.container}>
+                                <Text style={stylesBreak.activityName}>{`Long break`}</Text>
+                                <Text style={[stylesBase.timer, stylesBreak.timer]}>{convertDurationSecondsToHm(activeStopwatch)}</Text>
+                                <Text style={stylesBreak.holdInfo}>Hold to stop the session</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </Modal>
+                </SafeAreaView>
+            </SafeAreaProvider>
         )
     }
 }
-
 
 const stylesBase = StyleSheet.create({
     container: {
@@ -349,7 +348,7 @@ const stylesFocus = StyleSheet.create({
     }
 })
 
-const stylesShortBreak = StyleSheet.create({
+const stylesBreak = StyleSheet.create({
     container: {
         backgroundColor: '#8d5429'
     },

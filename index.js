@@ -5,7 +5,7 @@
 import {AppRegistry} from 'react-native';
 import {name as appName} from './app.json';
 import React from "react";
-import {createStaticNavigation, NavigationContainer} from '@react-navigation/native';
+import {createStaticNavigation} from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import {createNativeStackNavigator} from "@react-navigation/native-stack";
 import StatisticScreen from './src/screen/StatisticScreen';
@@ -13,14 +13,18 @@ import SessionScreen from "./src/screen/SessionScreen";
 import ScheduleScreen from "./src/screen/ScheduleScreen";
 import SettingsScreen from "./src/screen/SettingsScreen";
 import Icon from '@react-native-vector-icons/fontawesome6';
+import TagScreen from "./src/screen/TagScreen";
+import LandingScreen from "./src/screen/LandingScreen";
+import SignUpScreen from "./src/screen/SignUpScreen";
+import OTPScreen from "./src/screen/OTPScreen";
+import SignInScreen from "./src/screen/SignInScreen";
+import ForgotPasswordScreen from "./src/screen/ForgotPasswordScreen";
 
-const RootStack = createBottomTabNavigator({
+const BottomStack = createBottomTabNavigator({
     initialRouteName: 'Session',
     screens: {
         Statistic: StatisticScreen,
-        Session: {
-            screen: SessionScreen,
-        },
+        Session: SessionScreen,
         Schedule: ScheduleScreen,
         Settings: SettingsScreen,
     },
@@ -35,6 +39,25 @@ const RootStack = createBottomTabNavigator({
             }
         }
     })
+});
+
+const RootStack = createNativeStackNavigator({
+    initialRouteName: 'BottomStack',
+    screens: {
+        BottomStack: BottomStack,
+        Landing: LandingScreen,
+        SignUp: SignUpScreen,
+        OTP: OTPScreen,
+        SignIn: SignInScreen,
+        ForgotPassword: ForgotPasswordScreen,
+        Tag: TagScreen,
+    },
+    screenOptions:  ({ route }) => {
+        switch (route.name) {
+            case 'Tag': return { title: 'Select tag' }
+            default: return { headerShown: false }
+        }
+    }
 });
 
 const Navigation = createStaticNavigation(RootStack);

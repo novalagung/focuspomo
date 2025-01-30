@@ -76,7 +76,7 @@ function SessionScreen() {
     }
 
     const startShortBreak = () => {
-        console.log('start short break')
+        console.log('start short break', shortBreakDuration, shortBreakDurationLabel)
         useSessionStore.setState({
             activeSessionActivity: 'short break',
             activeStopwatch: shortBreakDuration,
@@ -129,7 +129,7 @@ function SessionScreen() {
 
         const nextTime = activeStopwatch - 1
         if (nextTime >= 0) {
-            console.log('===> countdown', nextTime, activeSessionActivityRef.current, focusCompleted)
+            console.log('===> countdown', nextTime, activeSessionActivityRef.current, focusCompleted, focusRepeatCount-1)
             useSessionStore.setState({
                 activeStopwatch: nextTime
             })
@@ -151,10 +151,16 @@ function SessionScreen() {
     }
 
     useEffect(() => {
+        if (!session) {
+            return
+        }
         activeSessionActivityRef.current = activeSessionActivity;
     }, [activeSessionActivity]);
 
     useEffect(() => {
+        if (!session) {
+            return
+        }
         setTimeout(startTimer,  1000);
     }, [activeStopwatch])
 

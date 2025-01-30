@@ -3,16 +3,25 @@ import * as React from 'react';
 import {View, Text, StyleSheet, TextInput} from 'react-native';
 import Icon from "@react-native-vector-icons/fontawesome6";
 import {useNavigation} from "@react-navigation/native";
+import useUserStore from "../store/user-store";
 
 function SignInScreen() {
     const navigation = useNavigation();
+
+    const session = useUserStore((state) => state.session);
+    const email = useUserStore((state) => state.email);
+
+    const doSetEmail = (text) => {
+        useUserStore.setState({email: text});
+    }
 
     const doForgotPassword = () => {
         navigation.navigate('ForgotPassword')
     }
 
     const doSignIn = () => {
-        navigation.navigate('SignIn')
+        useUserStore.setState({session: "session"})
+        navigation.popTo('BottomStack')
     }
 
     return (
@@ -26,7 +35,7 @@ function SignInScreen() {
                     </View>
                     <View style={style.formItemRow}>
                         <Icon name="envelope" size={18} color="#5e5e5e"/>
-                        <TextInput placeholder={"Enter your email"} style={style.formItemInput} />
+                        <TextInput placeholder={"Enter your email"} style={style.formItemInput} onChangeText={doSetEmail} />
                     </View>
                 </View>
                 <View style={style.formItem}>

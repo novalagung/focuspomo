@@ -136,7 +136,8 @@ const StatisticScreen = () => {
 
 const styles = StyleSheet.create({
     container: {
-        padding: 20
+        padding: 20,
+        backgroundColor: 'white'
     },
     containerFlex: {
         alignItems: 'center',

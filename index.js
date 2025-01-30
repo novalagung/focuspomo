@@ -11,7 +11,7 @@ import {createNativeStackNavigator} from "@react-navigation/native-stack";
 import StatisticScreen from './src/screen/StatisticScreen';
 import SessionScreen from "./src/screen/SessionScreen";
 import ScheduleScreenWIP from "./src/screen/ScheduleScreenWIP";
-import SettingsScreenWIP from "./src/screen/SettingsScreenWIP";
+import AccountScreen from "./src/screen/AccountScreen";
 import Icon from '@react-native-vector-icons/fontawesome6';
 import TagScreen from "./src/screen/TagScreen";
 import LandingScreen from "./src/screen/LandingScreen";
@@ -19,6 +19,7 @@ import SignUpScreen from "./src/screen/SignUpScreen";
 import OTPScreenWIP from "./src/screen/OTPScreenWIP";
 import SignInScreen from "./src/screen/SignInScreen";
 import ForgotPasswordScreen from "./src/screen/ForgotPasswordScreen";
+import SettingsScreen from "./src/screen/SettingsScreen";
 
 const BottomStack = createBottomTabNavigator({
     initialRouteName: 'Session',
@@ -26,7 +27,7 @@ const BottomStack = createBottomTabNavigator({
         Statistic: StatisticScreen,
         Session: SessionScreen,
         Schedule: ScheduleScreenWIP,
-        Settings: SettingsScreenWIP,
+        Account: AccountScreen,
     },
     screenOptions:  ({ route }) => ({
         headerShown: false,
@@ -35,7 +36,7 @@ const BottomStack = createBottomTabNavigator({
                 case 'Statistic': return (<Icon name="chart-simple" size={20} iconStyle="solid" />)
                 case 'Session': return (<Icon name="clock" size={20} iconStyle="solid" />)
                 case 'Schedule': return (<Icon name="calendar" size={20} iconStyle="solid" />)
-                case 'Settings': return (<Icon name="user" size={20} iconStyle="solid" />)
+                case 'Account': return (<Icon name="user" size={20} iconStyle="solid" />)
             }
         }
     })
@@ -50,11 +51,13 @@ const RootStack = createNativeStackNavigator({
         OTP: OTPScreenWIP,
         SignIn: SignInScreen,
         ForgotPassword: ForgotPasswordScreen,
+        Settings: SettingsScreen,
         Tag: TagScreen,
     },
     screenOptions:  ({ route }) => {
         switch (route.name) {
             case 'Tag': return { title: 'Select tag' }
+            case 'Settings': return { title: 'Settings' }
             default: return { headerShown: false }
         }
     }
